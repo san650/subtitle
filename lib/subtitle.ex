@@ -1,18 +1,16 @@
+alias Subtitle.SubRip
+
 defmodule Subtitle do
   @moduledoc """
   Documentation for Subtitle.
   """
 
   @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Subtitle.hello()
-      :world
-
+  Returns a stream of %Subtitle.Frame{} structs
   """
-  def hello do
-    :world
+  def from_file(path) do
+    path
+    |> File.stream!([], :line)
+    |> SubRip.stream()
   end
 end
