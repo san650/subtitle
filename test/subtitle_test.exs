@@ -1,7 +1,7 @@
 alias Subtitle.Frame
 
 defmodule SubtitleTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest Subtitle
 
   @frame1 %Frame{

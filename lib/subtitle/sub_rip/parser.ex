@@ -17,7 +17,8 @@ defmodule Subtitle.SubRip.Parser do
 
   defstruct [
     :state,
-    :frame
+    frame: %Frame{},
+    caption_buffer: []
   ]
 
   @doc """
@@ -25,8 +26,7 @@ defmodule Subtitle.SubRip.Parser do
   """
   def new() do
     %__MODULE__{
-      state: :frame_index,
-      frame: %Frame{}
+      state: :frame_index
     }
   end
 
@@ -44,7 +44,7 @@ defmodule Subtitle.SubRip.Parser do
       [] -> continue(parser)
       [[_match, value]] ->
         parser
-        |> put_frame(%{frame | index: value})
+        |> put_frame(%{frame | index: String.to_integer(value)})
         |> transition()
     end
   end
@@ -84,15 +84,25 @@ defmodule Subtitle.SubRip.Parser do
     end
   end
 
-  def parse(%__MODULE__{state: :frame_caption, frame: frame} = parser, "\n") do
+  def parse(%__MODULE__{state: :frame_caption, caption_buffer: buffer, frame: frame} = parser, "\n") do
+    caption =
+      buffer
+      |> Enum.reverse()
+      |> Enum.map(fn value ->
+        {encoding, _length} = :unicode.bom_to_encoding(value)
+        :unicode.characters_to_binary(value, encoding)
+      end)
+      |> to_string()
+      |> String.trim_trailing()
+
     parser
-    |> put_frame(%{frame | caption: Enum.reverse(frame.caption)})
+    |> put_frame(%{frame | caption: caption})
     |> transition()
   end
 
-  def parse(%__MODULE__{state: :frame_caption, frame: frame} = parser, line) do
+  def parse(%__MODULE__{state: :frame_caption} = parser, line) do
     parser
-    |> put_frame(%{frame | caption: [line | frame.caption]})
+    |> append_buffer(line)
     |> continue()
   end
 
@@ -104,12 +114,16 @@ defmodule Subtitle.SubRip.Parser do
     index = Enum.find_index(@states, &(&1 == state))
 
     case Enum.at(@states, index + 1) do
-      :frame_end -> {:ok, Frame.normalize(frame)}
+      :frame_end -> {:ok, frame}
       state -> continue(%{parser|state: state})
     end
   end
 
   defp put_frame(%__MODULE__{} = parser, %Frame{} = frame) do
     %{parser|frame: frame}
+  end
+
+  defp append_buffer(%__MODULE__{caption_buffer: buffer} = parser, data) do
+    %{parser | caption_buffer: [data | buffer]}
   end
 end
