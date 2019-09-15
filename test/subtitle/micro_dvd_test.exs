@@ -7,6 +7,8 @@ defmodule Subtitle.MicroDVDTest do
   use ExUnit.Case, async: true
   doctest MicroDVD
 
+  import Subtitle.StreamHelper
+
   @subtitle """
   {100}{200}El mundo ha cambiado.
   {300}{400}Lo siento en el agua.|Lo siento en la tierra.
@@ -31,14 +33,10 @@ defmodule Subtitle.MicroDVDTest do
   describe "#stream" do
     test "returns a stream of frames" do
       assert [@frame1, @frame2] ==
-               dummy_stream()
+               @subtitle
+               |> create_stream()
                |> MicroDVD.stream(fps: @fps)
                |> Enum.to_list()
     end
-  end
-
-  defp dummy_stream() do
-    {:ok, file} = StringIO.open(@subtitle)
-    IO.stream(file, :line)
   end
 end

@@ -7,6 +7,8 @@ defmodule Subtitle.SubRipTest do
   use ExUnit.Case, async: true
   doctest SubRip
 
+  import Subtitle.StreamHelper
+
   @subtitle """
   1
   00:00:00,000 --> 00:00:01,000
@@ -46,14 +48,10 @@ defmodule Subtitle.SubRipTest do
   describe "#stream" do
     test "returns a stream of frames" do
       assert [@frame1, @frame2, @frame3] ==
-               dummy_stream()
+               @subtitle
+               |> create_stream()
                |> SubRip.stream()
                |> Enum.to_list()
     end
-  end
-
-  defp dummy_stream() do
-    {:ok, file} = StringIO.open(@subtitle)
-    IO.stream(file, :line)
   end
 end
