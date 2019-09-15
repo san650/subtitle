@@ -10,9 +10,9 @@ defmodule Subtitle.SubRip.ParserTest do
   describe "new/0" do
     test "returns new struct" do
       assert %Parser{
-        state: :frame_index,
-        frame: %Frame{}
-      } == Parser.new()
+               state: :frame_index,
+               frame: %Frame{}
+             } == Parser.new()
     end
   end
 
@@ -51,10 +51,9 @@ defmodule Subtitle.SubRip.ParserTest do
 
     test "parses begin_time" do
       check all hour <- StreamData.integer(0..23),
-        minute <- StreamData.integer(0..59),
-        second <- StreamData.integer(0..59),
-        millisecond <- StreamData.integer(0..999) do
-
+                minute <- StreamData.integer(0..59),
+                second <- StreamData.integer(0..59),
+                millisecond <- StreamData.integer(0..999) do
         {:ok, time} = Time.new(hour, minute, second, millisecond)
         timestamp = to_timestamp(hour, minute, second, millisecond)
 
@@ -65,10 +64,9 @@ defmodule Subtitle.SubRip.ParserTest do
 
     test "parses end_time" do
       check all hour <- StreamData.integer(0..23),
-        minute <- StreamData.integer(0..59),
-        second <- StreamData.integer(0..59),
-        millisecond <- StreamData.integer(0..999) do
-
+                minute <- StreamData.integer(0..59),
+                second <- StreamData.integer(0..59),
+                millisecond <- StreamData.integer(0..999) do
         {:ok, time} = Time.new(hour, minute, second, millisecond)
         timestamp = to_timestamp(hour, minute, second, millisecond)
 
@@ -98,30 +96,32 @@ defmodule Subtitle.SubRip.ParserTest do
 
     test "parses one line captions" do
       check all string <- StreamData.string(:printable),
-        string != "" do
-
+                string != "" do
         assert {:cont, parser} = Parser.parse(@parser, string)
         assert {:ok, %{caption: ^string}} = Parser.parse(parser, "\n")
       end
     end
 
     test "supports latin1" do
-      latin1 = <<0x53, 0x45, 0xd1,  0x4f, 0x52>>
+      latin1 = <<0x53, 0x45, 0xD1, 0x4F, 0x52>>
       assert {:cont, parser} = Parser.parse(@parser, latin1)
       assert {:ok, %{caption: "SEÑOR"}} = Parser.parse(parser, "\n")
     end
 
     test "supports utf8" do
-      utf8 = <<0xe6, 0x97, 0xa5, 0xe6, 0x9c, 0xac, 0xe4, 0xba, 0xba>>
+      utf8 = <<0xE6, 0x97, 0xA5, 0xE6, 0x9C, 0xAC, 0xE4, 0xBA, 0xBA>>
       assert {:cont, parser} = Parser.parse(@parser, utf8)
       assert {:ok, %{caption: "日本人"}} = Parser.parse(parser, "\n")
     end
   end
 
   defp to_timestamp(hour, minute, second, millisecond) do
-    String.pad_leading(to_string(hour), 2, "0") <> ":" <>
-      String.pad_leading(to_string(minute), 2, "0") <> ":" <>
-      String.pad_leading(to_string(second), 2, "0") <> "," <>
+    String.pad_leading(to_string(hour), 2, "0") <>
+      ":" <>
+      String.pad_leading(to_string(minute), 2, "0") <>
+      ":" <>
+      String.pad_leading(to_string(second), 2, "0") <>
+      "," <>
       String.pad_leading(to_string(millisecond), 3, "0")
   end
 end

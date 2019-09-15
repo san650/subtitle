@@ -12,7 +12,7 @@ defmodule Subtitle.SubRip.Parser do
     :frame_index,
     :frame_time,
     :frame_caption,
-    :frame_end,
+    :frame_end
   ]
 
   defstruct [
@@ -41,7 +41,9 @@ defmodule Subtitle.SubRip.Parser do
   # @spec t() :: {:ok, Frame.t()} | {:cont, t()}
   def parse(%__MODULE__{state: :frame_index, frame: frame} = parser, line) do
     case Regex.scan(~r/^(\d+)$/, line) do
-      [] -> continue(parser)
+      [] ->
+        continue(parser)
+
       [[_match, value]] ->
         parser
         |> put_frame(%{frame | index: String.to_integer(value)})
@@ -50,8 +52,13 @@ defmodule Subtitle.SubRip.Parser do
   end
 
   def parse(%__MODULE__{state: :frame_time, frame: frame} = parser, line) do
-    case Regex.scan(~r/^(\d{2}):(\d{2}):(\d{2}),(\d{3}) --> (\d{2}):(\d{2}):(\d{2}),(\d{3})$/, line) do
-      [] -> continue(parser)
+    case Regex.scan(
+           ~r/^(\d{2}):(\d{2}):(\d{2}),(\d{3}) --> (\d{2}):(\d{2}):(\d{2}),(\d{3})$/,
+           line
+         ) do
+      [] ->
+        continue(parser)
+
       [
         [
           _,
@@ -65,18 +72,21 @@ defmodule Subtitle.SubRip.Parser do
           end_microsecond
         ]
       ] ->
-        {:ok, begin_time} = Time.new(
-          String.to_integer(begin_hour),
-          String.to_integer(begin_minute),
-          String.to_integer(begin_second),
-          String.to_integer(begin_microsecond)
-        )
-        {:ok, end_time} = Time.new(
-          String.to_integer(end_hour),
-          String.to_integer(end_minute),
-          String.to_integer(end_second),
-          String.to_integer(end_microsecond)
-        )
+        {:ok, begin_time} =
+          Time.new(
+            String.to_integer(begin_hour),
+            String.to_integer(begin_minute),
+            String.to_integer(begin_second),
+            String.to_integer(begin_microsecond)
+          )
+
+        {:ok, end_time} =
+          Time.new(
+            String.to_integer(end_hour),
+            String.to_integer(end_minute),
+            String.to_integer(end_second),
+            String.to_integer(end_microsecond)
+          )
 
         parser
         |> put_frame(%{frame | begin_time: begin_time, end_time: end_time})
@@ -84,7 +94,10 @@ defmodule Subtitle.SubRip.Parser do
     end
   end
 
-  def parse(%__MODULE__{state: :frame_caption, caption_buffer: buffer, frame: frame} = parser, "\n") do
+  def parse(
+        %__MODULE__{state: :frame_caption, caption_buffer: buffer, frame: frame} = parser,
+        "\n"
+      ) do
     parser
     |> put_frame(%{frame | caption: buffer_to_caption(buffer)})
     |> transition()
@@ -105,12 +118,12 @@ defmodule Subtitle.SubRip.Parser do
 
     case Enum.at(@states, index + 1) do
       :frame_end -> {:ok, frame}
-      state -> continue(%{parser|state: state})
+      state -> continue(%{parser | state: state})
     end
   end
 
   defp put_frame(%__MODULE__{} = parser, %Frame{} = frame) do
-    %{parser|frame: frame}
+    %{parser | frame: frame}
   end
 
   defp append_buffer(%__MODULE__{caption_buffer: buffer} = parser, data) do
@@ -122,15 +135,16 @@ defmodule Subtitle.SubRip.Parser do
     |> Enum.reverse()
     |> to_string()
     |> String.trim_trailing()
-  rescue _error in UnicodeConversionError ->
-    # FIXME: If the file was read with an incorrect encoding we might need to
-    # fallback to latin1
-    buffer
-    |> Enum.reverse()
-    |> Enum.map(fn value ->
-      :unicode.characters_to_binary(value, :latin1)
-    end)
-    |> to_string()
-    |> String.trim_trailing()
+  rescue
+    _error in UnicodeConversionError ->
+      # FIXME: If the file was read with an incorrect encoding we might need to
+      # fallback to latin1
+      buffer
+      |> Enum.reverse()
+      |> Enum.map(fn value ->
+        :unicode.characters_to_binary(value, :latin1)
+      end)
+      |> to_string()
+      |> String.trim_trailing()
   end
 end
