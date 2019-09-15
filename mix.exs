@@ -19,6 +19,7 @@ defmodule Subtitle.MixProject do
 
   defp deps do
     [
+      {:benchee, "~> 1.0", only: :dev},
       {:stream_data, "~> 0.4", only: :test}
     ]
   end
