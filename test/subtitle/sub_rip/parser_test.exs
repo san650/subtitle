@@ -22,7 +22,7 @@ defmodule Subtitle.SubRip.ParserTest do
     }
 
     test "parses index" do
-      check all index <- StreamData.positive_integer() do
+      check all(index <- StreamData.positive_integer()) do
         assert {:cont, %{frame: frame}} = Parser.parse(@parser, "#{index}\n")
         assert %{index: ^index} = frame
       end
@@ -50,10 +50,12 @@ defmodule Subtitle.SubRip.ParserTest do
     }
 
     test "parses begin_time" do
-      check all hour <- StreamData.integer(0..23),
-                minute <- StreamData.integer(0..59),
-                second <- StreamData.integer(0..59),
-                millisecond <- StreamData.integer(0..999) do
+      check all(
+              hour <- StreamData.integer(0..23),
+              minute <- StreamData.integer(0..59),
+              second <- StreamData.integer(0..59),
+              millisecond <- StreamData.integer(0..999)
+            ) do
         {:ok, time} = Time.new(hour, minute, second, millisecond)
         timestamp = to_timestamp(hour, minute, second, millisecond)
 
@@ -63,10 +65,12 @@ defmodule Subtitle.SubRip.ParserTest do
     end
 
     test "parses end_time" do
-      check all hour <- StreamData.integer(0..23),
-                minute <- StreamData.integer(0..59),
-                second <- StreamData.integer(0..59),
-                millisecond <- StreamData.integer(0..999) do
+      check all(
+              hour <- StreamData.integer(0..23),
+              minute <- StreamData.integer(0..59),
+              second <- StreamData.integer(0..59),
+              millisecond <- StreamData.integer(0..999)
+            ) do
         {:ok, time} = Time.new(hour, minute, second, millisecond)
         timestamp = to_timestamp(hour, minute, second, millisecond)
 
@@ -76,7 +80,7 @@ defmodule Subtitle.SubRip.ParserTest do
     end
 
     test "ignores everything else" do
-      check all string <- StreamData.string(:printable) do
+      check all(string <- StreamData.string(:printable)) do
         assert {:cont, %{state: :frame_time, frame: frame}} = Parser.parse(@parser, string)
         assert %{begin_time: nil, end_time: nil} = frame
       end
@@ -95,8 +99,10 @@ defmodule Subtitle.SubRip.ParserTest do
     }
 
     test "parses one line captions" do
-      check all string <- StreamData.string(:printable),
-                string != "" do
+      check all(
+              string <- StreamData.string(:printable),
+              string != ""
+            ) do
         assert {:cont, parser} = Parser.parse(@parser, string)
         assert {:ok, %{caption: ^string}} = Parser.parse(parser, "\n")
       end
