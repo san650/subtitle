@@ -10,10 +10,11 @@ defmodule Subtitle do
   Returns a stream of %Subtitle.Frame{} structs
   """
   def from_file(path, options \\ []) do
-    file_options = case Keyword.get(options, :encoding) do
-      nil -> []
-      encoding -> [encoding: encoding]
-    end
+    file_options =
+      case Keyword.get(options, :encoding) do
+        nil -> []
+        encoding -> [encoding: encoding]
+      end
 
     path
     |> File.stream!(file_options, :line)
