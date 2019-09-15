@@ -7,7 +7,8 @@ defmodule Subtitle.MixProject do
       version: "0.1.0",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -21,6 +22,12 @@ defmodule Subtitle.MixProject do
     [
       {:benchee, "~> 1.0", only: :dev},
       {:stream_data, "~> 0.4", only: :test}
+    ]
+  end
+
+  defp aliases do
+    [
+      perf: "run perf/benchee.exs"
     ]
   end
 end
