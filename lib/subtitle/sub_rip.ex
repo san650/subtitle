@@ -1,4 +1,5 @@
 alias Subtitle.SubRip.Parser
+alias Subtitle.Streamer
 
 defmodule Subtitle.SubRip do
   @moduledoc """
@@ -21,6 +22,8 @@ defmodule Subtitle.SubRip do
 
   ```
   """
+
+  @behaviour Streamer
 
   @doc """
   Returns a stream of Frame structs.
