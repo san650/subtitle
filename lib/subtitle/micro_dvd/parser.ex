@@ -51,9 +51,20 @@ defmodule Subtitle.MicroDVD.Parser do
   end
 
   defp to_caption(raw_caption) do
-    raw_caption
+    [raw_caption]
+    |> to_string()
     |> String.split("|")
     |> Enum.map(&String.trim/1)
     |> Enum.join("\n")
+  rescue
+    _error in UnicodeConversionError ->
+      # FIXME: If the file was read with an incorrect encoding we might need to
+      # fallback to latin1
+      raw_caption
+      |> :unicode.characters_to_binary(:latin1)
+      |> to_string()
+      |> String.split("|")
+      |> Enum.map(&String.trim/1)
+      |> Enum.join("\n")
   end
 end
