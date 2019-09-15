@@ -30,7 +30,7 @@ defmodule Subtitle.SubRip do
 
   This function receives a stream of lines of text.
   """
-  def stream(stream) do
+  def stream(stream, _options \\ []) do
     Stream.transform(stream, Parser.new(), &do_stream/2)
   end
 
