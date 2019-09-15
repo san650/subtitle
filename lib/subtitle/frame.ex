@@ -7,6 +7,6 @@ defmodule Subtitle.Frame do
     :index,
     :begin_time,
     :end_time,
-    :caption,
+    :caption
   ]
 end
