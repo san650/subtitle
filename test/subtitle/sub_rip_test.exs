@@ -53,7 +53,7 @@ defmodule Subtitle.SubRipTest do
   end
 
   defp dummy_stream() do
-    {:ok, file} = StringIO.open(@subtitle, [:line])
+    {:ok, file} = StringIO.open(@subtitle)
     IO.stream(file, :line)
   end
 end
