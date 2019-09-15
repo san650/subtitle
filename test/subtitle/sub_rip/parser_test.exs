@@ -91,6 +91,33 @@ defmodule Subtitle.SubRip.ParserTest do
     end
   end
 
+  describe "parse/2 in frame_caption state" do
+    @parser %Parser{
+      state: :frame_caption
+    }
+
+    test "parses one line captions" do
+      check all string <- StreamData.string(:printable),
+        string != "" do
+
+        assert {:cont, parser} = Parser.parse(@parser, string)
+        assert {:ok, %{caption: ^string}} = Parser.parse(parser, "\n")
+      end
+    end
+
+    test "supports latin1" do
+      latin1 = <<0x53, 0x45, 0xd1,  0x4f, 0x52>>
+      assert {:cont, parser} = Parser.parse(@parser, latin1)
+      assert {:ok, %{caption: "SEÑOR"}} = Parser.parse(parser, "\n")
+    end
+
+    test "supports utf8" do
+      utf8 = <<0xe6, 0x97, 0xa5, 0xe6, 0x9c, 0xac, 0xe4, 0xba, 0xba>>
+      assert {:cont, parser} = Parser.parse(@parser, utf8)
+      assert {:ok, %{caption: "日本人"}} = Parser.parse(parser, "\n")
+    end
+  end
+
   defp to_timestamp(hour, minute, second, millisecond) do
     String.pad_leading(to_string(hour), 2, "0") <> ":" <>
       String.pad_leading(to_string(minute), 2, "0") <> ":" <>

@@ -85,18 +85,8 @@ defmodule Subtitle.SubRip.Parser do
   end
 
   def parse(%__MODULE__{state: :frame_caption, caption_buffer: buffer, frame: frame} = parser, "\n") do
-    caption =
-      buffer
-      |> Enum.reverse()
-      |> Enum.map(fn value ->
-        {encoding, _length} = :unicode.bom_to_encoding(value)
-        :unicode.characters_to_binary(value, encoding)
-      end)
-      |> to_string()
-      |> String.trim_trailing()
-
     parser
-    |> put_frame(%{frame | caption: caption})
+    |> put_frame(%{frame | caption: buffer_to_caption(buffer)})
     |> transition()
   end
 
@@ -125,5 +115,22 @@ defmodule Subtitle.SubRip.Parser do
 
   defp append_buffer(%__MODULE__{caption_buffer: buffer} = parser, data) do
     %{parser | caption_buffer: [data | buffer]}
+  end
+
+  defp buffer_to_caption(buffer) do
+    buffer
+    |> Enum.reverse()
+    |> to_string()
+    |> String.trim_trailing()
+  rescue _error in UnicodeConversionError ->
+    # FIXME: If the file was read with an incorrect encoding we might need to
+    # fallback to latin1
+    buffer
+    |> Enum.reverse()
+    |> Enum.map(fn value ->
+      :unicode.characters_to_binary(value, :latin1)
+    end)
+    |> to_string()
+    |> String.trim_trailing()
   end
 end
