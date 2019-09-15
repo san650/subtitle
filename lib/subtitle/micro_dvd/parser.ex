@@ -2,8 +2,7 @@ alias Subtitle.Frame
 
 defmodule Subtitle.MicroDVD.Parser do
   @moduledoc """
-  Parse a single Frame. The parser is defined as a finite state machine where
-  each line of text contains a fraction of a Frame (index or time or caption).
+  Parse a single Frame.
 
   The Frame struct is returned once it's completely parsed, it returns an
   intermediate parser state otherwise.
@@ -38,7 +37,6 @@ defmodule Subtitle.MicroDVD.Parser do
   defp to_frame([[_match, start_frame, end_frame, raw_caption]], %__MODULE__{fps: fps}) do
     frame =
       %Frame{}
-      |> Map.put(:index, 0)
       |> Map.put(:begin_time, to_time(start_frame, fps))
       |> Map.put(:end_time, to_time(end_frame, fps))
       |> Map.put(:caption, to_caption(raw_caption))

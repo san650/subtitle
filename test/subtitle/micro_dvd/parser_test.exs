@@ -19,8 +19,7 @@ defmodule Subtitle.MicroDVD.ParserTest do
       check all(frame <- StreamData.positive_integer()) do
         time = Time.add(~T[00:00:00], frame, :second)
 
-        assert {:ok, %{begin_time: ^time}} =
-          Parser.parse(@parser, "{#{frame}}{0}Foo")
+        assert {:ok, %{begin_time: ^time}} = Parser.parse(@parser, "{#{frame}}{0}Foo")
       end
     end
 
@@ -28,27 +27,26 @@ defmodule Subtitle.MicroDVD.ParserTest do
       check all(frame <- StreamData.positive_integer()) do
         time = Time.add(~T[00:00:00], frame, :second)
 
-        assert {:ok, %{end_time: ^time}} =
-          Parser.parse(@parser, "{0}{#{frame}}Foo")
+        assert {:ok, %{end_time: ^time}} = Parser.parse(@parser, "{0}{#{frame}}Foo")
       end
     end
 
     test "parses caption" do
-      check all(caption <- StreamData.string(:printable),
-        caption != ""
-      ) do
-        assert {:ok, %{caption: ^caption}} =
-          Parser.parse(@parser, "{0}{0}#{caption}")
+      check all(
+              caption <- StreamData.string(:printable),
+              caption != ""
+            ) do
+        assert {:ok, %{caption: ^caption}} = Parser.parse(@parser, "{0}{0}#{caption}")
       end
     end
 
     test "parses multiline caption" do
-      check all(line1 <- StreamData.string(:printable),
-        line2 <- StreamData.string(:printable)
-      ) do
+      check all(
+              line1 <- StreamData.string(:printable),
+              line2 <- StreamData.string(:printable)
+            ) do
         caption = "#{line1}\n#{line2}"
-        assert {:ok, %{caption: ^caption}} =
-          Parser.parse(@parser, "{0}{0}#{line1}|#{line2}")
+        assert {:ok, %{caption: ^caption}} = Parser.parse(@parser, "{0}{0}#{line1}|#{line2}")
       end
     end
   end

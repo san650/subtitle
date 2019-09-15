@@ -25,21 +25,18 @@ defmodule Subtitle.SubRipTest do
   """
 
   @frame1 %Frame{
-    index: 1,
     begin_time: ~T[00:00:00.000000],
     end_time: ~T[00:00:01.000000],
     caption: "Hello, world!"
   }
 
   @frame2 %Frame{
-    index: 2,
     begin_time: ~T[00:00:02.000000],
     end_time: ~T[00:00:03.000000],
     caption: "This is the second frame"
   }
 
   @frame3 %Frame{
-    index: 3,
     begin_time: ~T[00:00:04.000000],
     end_time: ~T[00:00:05.000000],
     caption: "This is the third line"

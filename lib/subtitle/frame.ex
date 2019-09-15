@@ -4,7 +4,6 @@ defmodule Subtitle.Frame do
   """
 
   defstruct [
-    :index,
     :begin_time,
     :end_time,
     :caption

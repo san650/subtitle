@@ -16,6 +16,7 @@ defmodule Subtitle.SubRip.Parser do
   ]
 
   defstruct [
+    :index,
     :state,
     frame: %Frame{},
     caption_buffer: []
@@ -46,7 +47,7 @@ defmodule Subtitle.SubRip.Parser do
 
       [[_match, value]] ->
         parser
-        |> put_frame(%{frame | index: String.to_integer(value)})
+        |> Map.put(:index, String.to_integer(value))
         |> transition()
     end
   end
