@@ -36,7 +36,7 @@ defmodule Subtitle.SubRip.ParserTest do
     #     assert %{index: nil} = frame
     #   end
     # end
-    #
+
     test "moves to the next state" do
       string = "1"
 
