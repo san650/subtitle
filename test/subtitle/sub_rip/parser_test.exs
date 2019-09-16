@@ -23,8 +23,7 @@ defmodule Subtitle.SubRip.ParserTest do
 
     test "parses index" do
       check all(index <- StreamData.positive_integer()) do
-        assert {:cont, %{frame: frame}} = Parser.parse(@parser, "#{index}\n")
-        assert %{index: ^index} = frame
+        assert {:cont, %{index: ^index}} = Parser.parse(@parser, "#{index}\n")
       end
     end
 
@@ -36,7 +35,7 @@ defmodule Subtitle.SubRip.ParserTest do
     #     assert %{index: nil} = frame
     #   end
     # end
-    #
+
     test "moves to the next state" do
       string = "1"
 

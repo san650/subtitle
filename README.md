@@ -1,6 +1,11 @@
 # Subtitle
 
-Elixir library to parse SubRip subtitle files (`.srt`).
+Elixir library to parse subtitle files.
+
+Current supported formats:
+
+* SubRip subtitle files (`.srt`).
+* MicroDVD subtitle fiels (`.txt` or `.sub`).
 
 ## Installation
 

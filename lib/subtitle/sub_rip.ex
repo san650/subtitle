@@ -1,4 +1,5 @@
 alias Subtitle.SubRip.Parser
+alias Subtitle.Streamer
 
 defmodule Subtitle.SubRip do
   @moduledoc """
@@ -22,12 +23,14 @@ defmodule Subtitle.SubRip do
   ```
   """
 
+  @behaviour Streamer
+
   @doc """
   Returns a stream of Frame structs.
 
   This function receives a stream of lines of text.
   """
-  def stream(stream) do
+  def stream(stream, _options \\ []) do
     Stream.transform(stream, Parser.new(), &do_stream/2)
   end
 
